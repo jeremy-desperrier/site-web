@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
 
 #[Route('/contact')]
 class ContactController extends AbstractController
@@ -22,7 +24,8 @@ class ContactController extends AbstractController
         Request $request, 
         MailerInterface $mailer,
         ContactMessageRepository $repo,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ParameterBagInterface $params
     ): Response
     {
         $user = $this->getUser();
@@ -31,9 +34,16 @@ class ContactController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        $cooldown = $params->get('MESSAGE_COOLDOWN_DATETIME') ?? '1 hour';
+
         $lastMessage = $repo->findLastMessageByUser($user);
-        if ($lastMessage && $lastMessage->getCreatedAt() > new \DateTime('-1 hour')) {
-            $this->addFlash('error', 'Vous ne pouvez envoyer qu’un message toutes les heures.');
+        if ($lastMessage && $lastMessage->getCreatedAt() > new \DateTime("-{$cooldown}")) {
+            $this->addFlash('error', "Vous ne pouvez envoyer qu’un message toutes les {$cooldown}.");
+
+            $remainingTime = $lastMessage->getCreatedAt()->diff(new \DateTime());
+            $remainingTimeMinutes = max(0, 60 - ($remainingTime->i));
+            
+            $this->addFlash('info', "Veuillez patienter encore {$remainingTimeMinutes} minutes avant d’envoyer un nouveau message.");
             return $this->redirectToRoute('app_home');
         }
 
