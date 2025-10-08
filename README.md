@@ -1,4 +1,4 @@
-# README — Espace-client (Symfony + Docker)
+# README — site-web (Symfony + Docker)
 
 Ce document explique comment **télécharger le projet depuis Git**, installer et lancer l'environnement Docker sous Windows, et exécuter les commandes nécessaires pour entrer dans les conteneurs et lancer des tâches (comme un cron).
 
@@ -19,8 +19,8 @@ Ouvre ton terminal et exécute :
 
 ```bash
 # Cloner le dépôt Git
-git clone https://github.com/TON_ORG/TON_REPO.git espace-client
-cd espace-client
+git clone https://github.com/jeremy-desperrier/site-web.git site-web
+cd site-web
 ```
 
 ---
@@ -80,7 +80,20 @@ winpty docker exec -it symfony_db bash
 
 ---
 
-## 5) Lancer la commande cron pour récuper le nombre d'utilisateur connecter aujourd'hui
+## 5) Créer la base de donnée avant de s'avanturer sur le site
+
+# Créer la base (si elle n’existe pas)
+```bash
+php bin/console doctrine:database:create
+```
+# Appliquer les migrations
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+---
+
+## 6) Lancer la commande cron pour récuper le nombre d'utilisateur connecter aujourd'hui
 
 Depuis le conteneur Symfony (`symfony_app`) :
 
