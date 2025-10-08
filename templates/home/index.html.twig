@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+  <h1>Bienvenue</h1>
+
+  {% if app.user %}
+      <p>Vous êtes connecté en tant que <strong>{{ app.user.email }}</strong></p>
+      <p>cliquer <a href="{{ path('app_contact') }}">ici<a/> pour envoyer un message</p>
+      <p><a href="{{ path('app_logout') }}"> déconnection <a/></p>
+  {% else %}
+      <p>Vous n'êtes pas connecté.
+      <br> <a href="{{ path('app_login') }}">Se connecter</a>
+      <br> <a href="{{ path('app_register') }}">S'inscrire</a></p>
+  {% endif %}
+
+{% endblock %}
